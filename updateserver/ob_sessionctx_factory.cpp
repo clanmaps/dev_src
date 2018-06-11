@@ -151,6 +151,8 @@ namespace oceanbase
       checksum_callback_list_.reset();
       dml_count_ = v4si_zero;
       group_id_ = -1; //add by zhouhuan
+      rel_offset_ = -1;
+      rel_id_ = -1;
     }
 
     ObUpsMutator &RWSessionCtx::get_ups_mutator()

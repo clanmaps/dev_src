@@ -472,6 +472,11 @@ namespace oceanbase
             {
               TBSYS_LOG(ERROR, "set_log_position()=>%d", err);
             }
+            else
+            {
+               session_ctx->set_log_pos(cur_pos.group_id_, cur_pos.rel_offset_, cur_pos.rel_id_);
+            }
+
           }
           write_clog_mutex_.unlock();
 

@@ -232,6 +232,9 @@ namespace oceanbase
         void reset_stmt();
         //add by zhouhuan [scalablecommit] 20160426:b
         void set_group_id(int64_t group_id) { group_id_ = group_id ; }
+        void set_log_pos(int64_t group_id, int32_t rel_offset, int32_t rel_id)
+        { group_id_ = group_id; rel_offset_ = rel_offset; rel_id_ = rel_id; }
+
         int64_t get_group_id() { return group_id_ ; }
         //add :e
       private:
@@ -257,6 +260,9 @@ namespace oceanbase
         v4si mark_dml_count_;
         v4si dml_count_;
         int64_t group_id_; //add by zhouhuan [scalablecommit] 20160426
+        int32_t rel_offset_;
+        int32_t rel_id_;
+
         //add wangjiahao [tablelock] 20160616 :b
         SessionTableLockInfo* table_lock_info_;
         //add :e

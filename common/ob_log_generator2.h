@@ -149,6 +149,7 @@ namespace oceanbase
       int64_t get_first_fill_time() const;
       void set_last_fill_time(const int64_t cur_time);
       int64_t get_last_fill_time() const;
+      int64_t to_string(char *buf, const int64_t buf_len) const;
 
     };
 

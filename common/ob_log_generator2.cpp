@@ -117,6 +117,14 @@ namespace oceanbase
       destroy();
     }
 
+    int64_t LogGroup::to_string(char *buf, const int64_t buf_len) const
+    {
+      int64_t pos = 0;
+      databuff_printf(buf, buf_len, pos, "gid: %ld, ts_seq: %ld, last_ts_seq: %ld, trans_count: %ld, filled_count: %ld",
+          group_id_, ts_seq_, last_ts_seq_, len_, ref_cnt_);
+      return pos;
+    }
+
     bool LogGroup::is_clear() const
     {
       return 0 == ref_cnt_ && 0 == len_ && 0 == count_ && 0 == start_timestamp_ && start_cursor_.equal(end_cursor_);
@@ -537,6 +545,7 @@ namespace oceanbase
       }
       else
       {
+        uint64_t fail_tries = 0;
         while(true)
         {
          /*TBSYS_LOG(INFO, "test::zhouhuan group_id[%p]: %ld, last_ts_seq_[%p]: %ld, cur_pos[%p]: %d",
@@ -546,6 +555,11 @@ namespace oceanbase
 
           if (cur_group->last_ts_seq_ != cur_pos.group_id_ + cur_group->READY)
           {
+              if( ++fail_tries % 1000000 == 0 ) {
+               TBSYS_LOG(ERROR, "set_group_start_ts failed %lu trials, desired gid: %ld, buffer[ %s ]",
+                         fail_tries, cur_pos.group_id_, to_cstring(*cur_group));
+          }
+
             usleep(1);
           }
           else
@@ -581,6 +595,7 @@ namespace oceanbase
     {
       int64_t trans_id;
       LogGroup* cur_group = get_log_group(cur_pos.group_id_);
+      uint64_t fail_tries = 0;
       while(true)
       {
         /*TBSYS_LOG(INFO, "test::zhouhuan group_id[%p]: %ld, ts_seq_[%p]: %ld, cur_pos[%p]: %d",
@@ -589,6 +604,11 @@ namespace oceanbase
                   &(cur_pos.rel_id_), cur_pos.rel_id_);*/
         if (cur_group->ts_seq_ != cur_pos.group_id_ + cur_group->READY)
         {
+            if( ++fail_tries % 1000000 == 0 ) {
+               TBSYS_LOG(ERROR, "get_trans_id failed for %lu trials, desired gid: %ld, buffer[ %s ]",
+                         fail_tries, cur_pos.group_id_, to_cstring(*cur_group));
+        }
+
           usleep(1);
         }
         else
@@ -1143,10 +1163,16 @@ namespace oceanbase
 //                  cur_group->group_id_,cur_group->ts_seq_, next_group->group_id_, next_group->ts_seq_, next_group_id);
 
         //set start_log_id last_ts_seq start_log_cursor of next_group
+        uint64_t fail_tries = 0;
         while(true)
         {
           if (next_group->ts_seq_ != next_group_id)
           {
+              if( ++fail_tries % 1000000 == 0 ) {
+              TBSYS_LOG(ERROR, "append_eof failed for %lu trials, desired gid: %ld, buffer[ %s ]",
+                        fail_tries, next_group_id, to_cstring(*next_group));
+           }
+
             usleep(1);
           }
           else
