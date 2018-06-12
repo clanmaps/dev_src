@@ -73,6 +73,7 @@ namespace oceanbase
     int FLogPos::append(FLogPos &pos, int64_t len, int64_t limit, int64_t& switch_flag)
     {
       int err = OB_SUCCESS;
+      switch_flag = 0;  //debug for scalable commit
 
       if ( len < 0 || limit <= 0 )
       {
